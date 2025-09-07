@@ -1,0 +1,18 @@
+<p-toast></p-toast>
+
+<div class="p-fluid"> 
+
+    <p-card *ngIf="examDetails?.mastery?.length > 0" class="p-mt-3">
+        <hr/>
+        <ng-template pTemplate="header p-mt-3">
+            <div class="text-lg font-semibold">Exam Mastery Chart</div>
+        </ng-template>
+        <ng-template pTemplate="content">
+            <canvas baseChart [datasets]="masteryChartData" [labels]="masteryChartLabels"
+                [options]="masteryChartOptions" [colors]="masteryChartColors" [legend]="true" [type]="'line'"
+                height="180">
+            </canvas>
+        </ng-template>
+    </p-card> 
+
+</div>

@@ -1,0 +1,119 @@
+<style>
+    ::ng-deep .w-full {
+        width: 100% !important;
+    }
+
+    .question-card {
+        border: 1px solid #d1d5db;
+        /* light gray */
+        background-color: #f9fafb;
+    }
+
+    .answer-block.correct-answer {
+        border: 1px solid #16a34a;
+        /* green */
+        background-color: #dcfce7;
+        /* light green */
+        color: #166534;
+    }
+
+    .answer-block.wrong-answer {
+        border: 1px solid #dc2626;
+        /* red */
+        background-color: #fee2e2;
+        /* light red */
+        color: #991b1b;
+    }
+</style>
+
+
+<p-toast></p-toast>
+
+<div class="p-fluid">
+    <p-card>
+        <ng-template pTemplate="header">
+            <div class="text-xl font-semibold">Exam Details</div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+            <div class="p-field">
+                <label for="profileDropdown">Select Student Profile</label>
+                <p-dropdown id="profileDropdown" [options]="profileList" [(ngModel)]="selectedProfile"
+                    optionLabel="title" optionValue="profile_id" [filter]="true" placeholder="Select Profile"
+                    (onChange)="getExamInfo($event)" appendTo="body" class="w-full">
+                </p-dropdown>
+            </div>
+
+            <div class="p-field">
+                <label for="examDropdown">Select Exam</label>
+                <p-dropdown id="examDropdown" [options]="examList" [(ngModel)]="selectedExam" optionLabel="title"
+                    optionValue="id" [filter]="true" placeholder="Select Exam" (onChange)="showExamDetailInfo($event)"
+                    appendTo="body" class="w-full">
+                </p-dropdown>
+            </div>
+
+            <div *ngIf="examInfoResolved" class="p-mt-3">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <div class="text-lg font-semibold">Exam Information</div>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                        <p>{{ exam_info }}</p>
+                        <button pButton type="button" [label]="exam_action_text"
+                            class="p-button-rounded p-button-outlined p-button-primary" (click)="startExam()"></button>
+                    </ng-template>
+                </p-card>
+            </div>
+        </ng-template>
+    </p-card>
+
+    <p-card *ngIf="examDetails?.info?.length > 0">
+        <ng-template pTemplate="header">
+            <div class="text-lg font-semibold">Exam Question Answer Information</div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+            <div *ngFor="let q of groupByQuestions(examDetails.info); let i = index"
+                class="question-card p-mb-4 p-p-3 rounded border-1">
+                <!-- Question Header -->
+                <div class="question-header text-md font-semibold p-mb-2">
+                    Q{{ i + 1 }} ({{ q.kc }}):
+                </div>
+                <div class="question-text p-mb-2">
+                    {{ q.question }}
+                </div>
+
+                <!-- Answers -->
+                <div *ngFor="let ans of q.answers" class="answer-block p-ml-4 p-mb-2 p-p-2 rounded border-1" [ngClass]="{
+             'correct-answer': ans.is_correct,
+             'wrong-answer': !ans.is_correct
+           }">
+                    <div>
+                        <strong>Answer:</strong> {{ ans.answer }}
+                    </div>
+                    <div *ngIf="!ans.is_correct" class="text-sm text-gray-600">
+                        <strong>Correct Answer:</strong> {{ ans.correct_answer }}
+                    </div>
+                    <div class="text-sm font-semibold mt-1">
+                        Correct? {{ ans.is_correct ? 'Yes' : 'No' }}
+                    </div>
+                </div>
+
+                <hr class="p-my-3 border-gray-300" />
+            </div>
+        </ng-template>
+    </p-card>
+
+    <p-card *ngIf="examDetails?.mastery?.length > 0" class="p-mt-3">
+        <ng-template pTemplate="header">
+            <div class="text-lg font-semibold">Mastery Chart</div>
+        </ng-template>
+        <ng-template pTemplate="content">
+            <canvas baseChart [datasets]="masteryChartData" [labels]="masteryChartLabels"
+                [options]="masteryChartOptions" [colors]="masteryChartColors" [legend]="true" [type]="'line'"
+                height="180">
+            </canvas>
+        </ng-template>
+    </p-card>
+
+</div>

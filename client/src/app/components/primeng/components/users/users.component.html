@@ -1,0 +1,154 @@
+<p-toast></p-toast>
+
+<div *ngIf="slug" class="card">
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button
+                pButton
+                pRipple
+                label="New User"
+                icon="pi pi-plus"
+                class="p-button-success p-mr-2"
+                (click)="openNew()"
+            ></button>
+            <button
+                pButton
+                pRipple
+                [label]="Delete"
+                icon="pi pi-trash"
+                class="p-button-danger"
+                (click)="deleteSelectedItems()"
+                [disabled]="!selectedItems || !selectedItems.length"
+            ></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button
+                pButton
+                pRipple
+                label="Import"
+                icon="pi pi-download"
+                class="p-button-info"
+                (click)="importItems()"
+            ></button
+            >&nbsp;
+            <button
+                pButton
+                pRipple
+                label="Export"
+                icon="pi pi-upload"
+                class="p-button-help"
+                (click)="exportItems()"
+            ></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table
+        #dt
+        [value]="items"
+        [rows]="10"
+        [paginator]="true"
+        [globalFilterFields]="['firstName', 'lastName', 'email']"
+        [(selection)]="selectedItems"
+        [rowHover]="true"
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true"
+    >
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Manage {{ itemName | titlecase }}</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input
+                        pInputText
+                        type="text"
+                        (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Search..."
+                    />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="code">First Name <p-sortIcon field="firstName"></p-sortIcon></th>
+                <th pSortableColumn="code">Last Name <p-sortIcon field="lastName"></p-sortIcon></th>
+                <th pSortableColumn="name">Email <p-sortIcon field="email"></p-sortIcon></th>
+                <th pSortableColumn="description">Roles <p-sortIcon field="roles"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                </td>
+                <td>{{ item.firstName }}</td>
+                <td>{{ item.lastName }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.roleNames }}</td>
+                <td>
+                    <button
+                        pButton
+                        pRipple
+                        icon="pi pi-pencil"
+                        class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editItem(item)"
+                    ></button>
+                    <button
+                        pButton
+                        pRipple
+                        icon="pi pi-trash"
+                        class="p-button-rounded p-button-warning"
+                        (click)="deleteItem(item)"
+                    ></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                In total there are {{ items ? items.length : 0 }} items.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="itemDialog" [style]="{ width: '450px' }" header="Details" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="fname">First Name</label>
+            <input type="text" pInputText id="fname" [(ngModel)]="item.firstName" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !item.firstName">First Name is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="lname">Last Name</label>
+            <input type="text" pInputText id="lname" [(ngModel)]="item.lastName" required />
+            <small class="p-invalid" *ngIf="submitted && !item.lastName">Last Name is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="name">Email</label>
+            <input type="text" pInputText id="email" [(ngModel)]="item.Email" required />
+            <small class="p-invalid" *ngIf="submitted && !item.email">Email is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="password">Password</label>
+            <input type="password" pInputText id="password" [(ngModel)]="password" required />
+            <small class="p-invalid" *ngIf="submitted && !password">Password is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="password2">Repeat Password</label>
+            <input type="password" pInputText id="password2" [(ngModel)]="password2" required />
+            <small class="p-invalid" *ngIf="submitted && !password2">Password is required.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveItem()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

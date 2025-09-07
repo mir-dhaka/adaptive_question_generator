@@ -1,0 +1,10 @@
+curl -X 'POST' \
+  'https://localhost:7000/api/Auth/register' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "firstName": "string1",
+  "lastName": "string1",
+  "email": "string1",
+  "password": "string1"
+}'

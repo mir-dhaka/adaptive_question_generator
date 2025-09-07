@@ -1,0 +1,212 @@
+<!-- notifications -->
+<p-toast></p-toast>
+
+<!-- item list -->
+<div *ngIf="slug" class="card">
+    <!-- toolbar -->
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New Exam Raw Data" icon="pi pi-plus" class="p-button-success p-mr-2"
+                (click)="openNew()"></button>
+            &nbsp;<button pButton pRipple [label]="Delete" icon="pi pi-trash" class="p-button-danger"
+                (click)="deleteSelectedItems()" [disabled]="!selectedItems || !selectedItems.length"></button>
+            &nbsp;<button pButton pRipple icon="fa fa-bolt" class="p-button-secondary" (click)="checkProfileData()"
+                [disabled]="!selectedItems || !selectedItems.length">
+                Check Data</button>
+            &nbsp;<button pButton pRipple icon="fa fa-bolt" class="p-button-primary"
+                (click)="createProfileForSelectedItems()" [disabled]="!selectedItems || !selectedItems.length">
+                Create Mastery</button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Import" icon="pi pi-download" class="p-button-info"
+                (click)="importItems()"></button>&nbsp;
+            <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"
+                (click)="exportItems()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- table -->
+    <p-table #dt [value]="items" [rows]="10" [paginator]="true" [globalFilterFields]="['email', 'dag_title', 'kc_title','question']"
+        [(selection)]="selectedItems" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Manage {{ itemName | titlecase }}</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+                <th pSortableColumn="dag_title">DAG <p-sortIcon field="dag_title"></p-sortIcon></th>
+                <th pSortableColumn="kc_title">KC <p-sortIcon field="kc_title"></p-sortIcon></th>
+                <th pSortableColumn="question">Question Title <p-sortIcon field="question"></p-sortIcon></th>
+                <th pSortableColumn="selected_option">Selected Option <p-sortIcon field="selected_option"></p-sortIcon>
+                </th>
+                <th pSortableColumn="time_taken">Time Taken <p-sortIcon field="time_taken"></p-sortIcon></th>
+                <th pSortableColumn="help_taken">Help Taken <p-sortIcon field="help_taken"></p-sortIcon></th>
+                <th pSortableColumn="screen_movement_weight">Screen Movement Weight <p-sortIcon
+                        field="screen_movement_weight"></p-sortIcon></th>
+                <th pSortableColumn="facial_expression_weight">Facial Expression Weight <p-sortIcon
+                        field="facial_expression_weight"></p-sortIcon></th>
+                <th pSortableColumn="is_processed">Is Processed <p-sortIcon field="is_processed"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                </td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.dag_title }}</td>
+                <td>{{ item.kc_title }}</td>
+                <td>{{ item.question }}</td>
+                <td>{{ item.selected_option }}</td>
+                <td>{{ item.time_taken }}</td>
+                <td>{{ item.help_taken }}</td>
+                <td>{{ item.screen_movement_weight }}</td>
+                <td>{{ item.facial_expression_weight }}</td>
+                <td>{{ item.is_processed }}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editItem(item)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                        (click)="deleteItem(item)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                In total there are {{ items ? items.length : 0 }} items.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- entry-edit form -->
+<p-dialog [(visible)]="itemDialog" [style]="{ width: '450px', height: '800px'}" header="Details" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="email">Email</label>
+            <input type="text" pInputText id="email" [(ngModel)]="item.email" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !item.email">Email is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="dag">DAG Title</label>
+            <input type="text" pInputText id="dag" [(ngModel)]="item.dag" required />
+            <small class="p-invalid" *ngIf="submitted && !item.dag">DAG is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="kc">KC Title</label>
+            <input type="text" pInputText id="kc" [(ngModel)]="item.kc" required />
+            <small class="p-invalid" *ngIf="submitted && !item.kc">KC is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="question">Question Title</label>
+            <input type="text" pInputText id="question" [(ngModel)]="item.question" required />
+            <small class="p-invalid" *ngIf="submitted && !item.question">Question is required.</small>
+        </div>
+
+        <div class="p-field">
+            <label for="selected_option">Selected Option(1-4)</label>
+            <input type="text" pInputText id="selected_option" [(ngModel)]="item.selected_option" required />
+            <small class="p-invalid" *ngIf="submitted && !item.selected_option">Selected option is required.</small>
+        </div>
+
+        <div class="p-field">
+            <label for="time_taken">Time Taken (seconds)</label>
+            <input type="number" pInputText id="time_taken" [(ngModel)]="item.time_taken" />
+        </div>
+
+        <div class="p-field">
+            <label for="help_taken">Help Taken (Count: 1-5)</label>
+            <input type="number" pInputText id="help_taken" [(ngModel)]="item.help_taken" />
+        </div>
+
+        <div class="p-field">
+            <label for="screen_movement_weight">Screen Movement Weight(0-1)</label>
+            <input type="number" pInputText id="screen_movement_weight" [(ngModel)]="item.screen_movement_weight"
+                step="0.01" />
+        </div>
+
+        <div class="p-field">
+            <label for="facial_expression_weight">Facial Expression Weight(0-1)</label>
+            <input type="number" pInputText id="facial_expression_weight" [(ngModel)]="item.facial_expression_weight"
+                step="0.01" />
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveItem()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- checkdata dialog -->
+<p-dialog [(visible)]="checkDataDialog" [style]="{ width: '800px', height: '800px' }" header="Check Data" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field"> 
+            <p-table [value]="checkDataList" styleClass="p-datatable-sm p-datatable-gridlines">
+                <ng-template pTemplate="header">
+                    <tr> 
+                        <th>Email</th>
+                        <th>User Exists?</th>
+                        <th>Profile Exists?</th>
+                        <th>DAG Exists?</th>
+                        <th>KC Exists?</th>
+                        <th>Question Exists?</th>
+                        <th>Option Valid?</th>
+                        <th>Time Taken</th>
+                        <th>Screen Weight</th>
+                        <th>Expression Weight</th>
+                        <th>Help Taken</th>
+                        <th>Estimated Mastery</th>
+                        <th>Valid?</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-item let-i="rowIndex">
+                    <tr>
+                        <td>{{ item.email }}</td>
+                        <!-- Profile Info -->
+                        <td>{{ item.profile_info.user }}</td>
+                        <td>{{ item.profile_info.profile }}</td>
+                        <!-- KC Info -->
+                        <td>{{ item.kc_info.dag_title }}</td>
+                        <td>{{ item.kc_info.kc_title }}</td>
+                        <td>{{ item.kc_info.question }}</td>
+                        <td>{{ item.kc_info.selected_option }}</td>
+                        <!-- Metrics -->
+                        <td>{{ item.metrics.time_taken }}</td>
+                        <td>{{ item.metrics.screen_movement_weight }}</td>
+                        <td>{{ item.metrics.facial_expression_weight }}</td>
+                        <td>{{ item.metrics.help_taken }}</td>
+                        <!-- Mastery -->
+                        <td>{{ item.mastery }}</td>
+                        <!-- Valid -->
+                        <td [ngStyle]="{ 
+                            'color': item['valid?'] === false ? 'red' : 'inherit', 
+                            'font-weight': item['valid?'] === false ? 'bold' : 'normal' 
+                        }">
+                            {{ item['valid?'] }}
+                        </td> 
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </ng-template> 
+</p-dialog>
+
+<!-- delete confirmation -->
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

@@ -1,0 +1,76 @@
+<div [@routerTransition]>
+    <h2 class="text-muted d-none">Dashboard <small>Statistics Overview</small></h2>
+    <!-- <div class="row">
+        <div class="col-md-12">
+            <ngb-carousel>
+                <ng-template *ngFor="let slider of sliders" ngbSlide>
+                    <img
+                        [src]="slider.imagePath"
+                        alt="Random first slide"
+                        class="img-fluid mx-auto d-block"
+                        width="100%"
+                    />
+                    <div class="carousel-caption">
+                        <h3>{{ slider.label }}</h3>
+                        <p>{{ slider.text }}</p>
+                    </div>
+                </ng-template>
+            </ngb-carousel>
+        </div>
+    </div> -->
+    <div class="row">
+        <div class="col-xl-3 col-lg-6">
+            <app-stat [bgClass]="'success'" [count]="dashboardCounters?.dags" [icon]="'fa-sitemap'"
+                [label]="'DAGs'"></app-stat>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <app-stat [bgClass]="'warning'" [count]="dashboardCounters?.kcs" [icon]="'fa-book'"
+                [label]="'Knowledge Comp.'"></app-stat>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <app-stat [bgClass]="'primary'" [count]="dashboardCounters?.students" [icon]="'fa-user'"
+                [label]="'Student Profiles'"></app-stat>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <app-stat [bgClass]="'danger'" [count]="dashboardCounters?.exams" [icon]="'fa-file-text-o'"
+                [label]="'Exams'"></app-stat>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <pn-mastery></pn-mastery>
+        </div>
+        <div class="col-lg-6">
+            <br />
+            <img [src]="dag_url" alt="DAG Diagram"
+                style="max-width: 100%; max-height: 100%; object-fit: contain;" />                
+            <h6 style="float:right"><b>DAG:</b>&nbsp;{{dag_label}}</h6>
+        </div>
+    </div>
+
+    <div class="row mt-1 d-none">
+        <div class="col-lg-8">
+            <div class="card card-default">
+                <div class="card-header"><i class="fa fa-clock-o fa-fw"></i> Responsive Timeline</div>
+                <!-- /.card-header -->
+                <app-timeline></app-timeline>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col-lg-8 -->
+        <div class="col-lg-4">
+            <div class="card card-default mb-3">
+                <div class="card-header"><i class="fa fa-bell fa-fw"></i> Notifications card</div>
+                <!-- /.card-header -->
+                <app-notification></app-notification>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <app-chat></app-chat>
+            <!-- /.card .chat-card -->
+        </div>
+        <!-- /.col-lg-4 -->
+    </div>
+</div>

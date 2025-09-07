@@ -1,0 +1,188 @@
+<p-toast></p-toast>
+
+<div *ngIf="slug" class="card">
+    <!-- toolbar -->
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New Student Data" icon="pi pi-plus" class="p-button-success p-mr-2"
+                (click)="openNew()"></button>
+            &nbsp;<button pButton pRipple [label]="Delete" icon="pi pi-trash" class="p-button-danger"
+                (click)="deleteSelectedItems()" [disabled]="!selectedItems || !selectedItems.length"></button>
+            &nbsp;<button pButton pRipple icon="fa fa-bolt" class="p-button-secondary" (click)="showCheckDataDialog()"
+                [disabled]="!selectedItems || !selectedItems.length">
+                Check Data</button>
+            &nbsp;<button pButton pRipple icon="fa fa-bolt" class="p-button-secondary"
+                (click)="createProfileDialog = true" [disabled]="!selectedItems || !selectedItems.length">
+                Create Profile</button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Import" icon="pi pi-download" class="p-button-info"
+                (click)="importItems()"></button>&nbsp;
+            <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"
+                (click)="exportItems()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- item list -->
+    <p-table #dt [value]="items" [rows]="10" [paginator]="true"
+        [globalFilterFields]="['firstname', 'lastname', 'email']" [(selection)]="selectedItems" [rowHover]="true"
+        dataKey="id" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Manage {{ itemName | titlecase }}</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="firstname">First Name <p-sortIcon field="firstname"></p-sortIcon></th>
+                <th pSortableColumn="lastname">Last Name <p-sortIcon field="lastname"></p-sortIcon></th>
+                <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+                <th pSortableColumn="is_processed">Is Processed <p-sortIcon field="is_processed"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                </td>
+                <td>{{ item.firstname }}</td>
+                <td>{{ item.lastname }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.is_processed }}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editItem(item)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                        (click)="deleteItem(item)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                In total there are {{ items ? items.length : 0 }} items.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- entry-edit form -->
+<p-dialog [(visible)]="itemDialog" [style]="{ width: '450px' }" header="Details" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="title">First Name</label>
+            <input type="text" pInputText id="firstname" [(ngModel)]="item.firstname" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !item.firstname">First Name is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="title">Last Name</label>
+            <input type="text" pInputText id="lastname" [(ngModel)]="item.lastname" required />
+            <small class="p-invalid" *ngIf="submitted && !item.lastname">Last Name is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="name">Email</label>
+            <input type="text" pInputText id="email" [(ngModel)]="item.email" required />
+            <small class="p-invalid" *ngIf="submitted && !item.email">Email is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="password">Password</label>
+            <input type="password" pInputText id="password" [(ngModel)]="item.password" required />
+            <small class="p-invalid" *ngIf="submitted && !item.password">Password is required.</small>
+        </div>
+        <div class="p-field d-none">
+            <label for="is_processed">Is Processed</label>
+            <input type="number" pInputText id="is_processed" [(ngModel)]="item.is_processed" />
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveItem()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- create profile dialog -->
+<p-dialog [(visible)]="createProfileDialog" [style]="{ width: '450px', height: '600px' }" header="Create Profile"
+    [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="dagDdl">Select DAG</label>
+            <p-dropdown [options]="dagList" [(ngModel)]="selectedDag" optionLabel="title" optionValue="id"
+                [filter]="true" filterBy="title" [showClear]="true" placeholder="Select Dag" id="dagDdl">
+            </p-dropdown>
+            <small class="p-invalid" *ngIf="submitted && !selectedDag">DAG is required.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="createProfileDialog=false"></button>
+        <button pButton pRipple label="Create" icon="pi pi-check" class="p-button-text"
+            (click)="createProfiles()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- checkdata dialog -->
+<p-dialog [(visible)]="checkDataDialog" [style]="{ width: '800px', height: '800px' }" header="Check Data" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="dagDdl">Select DAG</label>
+            <p-dropdown [options]="dagList" [(ngModel)]="selectedDag" optionLabel="title" optionValue="id"
+                [filter]="true" filterBy="title" [showClear]="true" placeholder="Select Dag" id="dagDdl">
+            </p-dropdown>
+            <small class="p-invalid" *ngIf="submitted && !selectedDag">DAG is required.</small>
+        </div>
+        <div class="p-field">
+
+            <p-table [value]="checkDataList" styleClass="p-datatable-sm p-datatable-gridlines">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>User Exist?</th>
+                        <th>Profile Exist?</th>
+                        <th>Valid?</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-item let-i="rowIndex">
+                    <tr>
+                        <td>{{ item.firstname }}</td>
+                        <td>{{ item.lastname }}</td>
+                        <td>{{ item.email }}</td>
+                        <td>{{ item.user }}</td>
+                        <td>{{ item.profile }}</td>
+                        <td [ngStyle]="{ 
+                            'color': item.valid === false ? 'red' : 'inherit', 
+                            'font-weight': item.valid === false ? 'bold' : 'normal' 
+                        }">
+                            {{ item.valid }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text"
+            (click)="checkDataDialog=false"></button>
+        <button pButton pRipple label="Check" icon="pi pi-check" class="p-button-text"
+            (click)="checkSelectedItems()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- delete confirmation -->
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

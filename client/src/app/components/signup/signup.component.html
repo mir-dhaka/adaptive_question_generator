@@ -1,0 +1,62 @@
+<pn-toast></pn-toast>
+<div [@routerTransition] class="login-page">
+    <div class="row justify-content-md-center align-items-center h-100">
+        <div class="col-md-4">
+            <img class="user-avatar d-none" src="assets/images/logo.png" [style.width.px]="150" alt="logo" />
+            <h1>{{ title | translate }}</h1>
+            <form role="form" (ngSubmit)="register()">
+                <div class="form-content">
+                    <div class="form-group">
+                        <input
+                            [(ngModel)]="model.first_name"
+                            name="first_name"
+                            placeholder="First Name"
+                            class="form-control input-underline input-lg"
+                            type="text"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <input
+                            [(ngModel)]="model.last_name"
+                            name="last_name"
+                            placeholder="Last Name"
+                            class="form-control input-underline input-lg"
+                            type="text"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <input
+                            [(ngModel)]="model.email"
+                            name="email"
+                            placeholder="Email"
+                            class="form-control input-underline input-lg"
+                            type="text"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <input
+                            [(ngModel)]="model.password"
+                            name="password"
+                            placeholder="Password"
+                            class="form-control input-underline input-lg"
+                            type="password"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <input
+                            [(ngModel)]="password2"
+                            name="password2"
+                            placeholder="Repeat Password"
+                            class="form-control input-underline input-lg"
+                            type="password"
+                        />
+                    </div>
+                </div>
+                <button type="submit" class="btn rounded-btn me-2">{{ 'Register' | translate }}</button>
+                <a [routerLink]="['/login']" class="btn rounded-btn">{{ 'Login' | translate }}</a>
+            </form>
+        </div>
+    </div>
+</div>

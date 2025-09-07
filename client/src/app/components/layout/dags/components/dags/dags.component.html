@@ -1,0 +1,112 @@
+<p-toast></p-toast>
+
+<div *ngIf="slug" class="card">
+    <!-- toolbar -->
+    <p-toolbar styleClass="p-mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New DAG" icon="pi pi-plus" class="p-button-success p-mr-2"
+                (click)="openNew()"></button>
+            <button pButton pRipple [label]="Delete" icon="pi pi-trash" class="p-button-danger"
+                (click)="deleteSelectedItems()" [disabled]="!selectedItems || !selectedItems.length"></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Import" icon="pi pi-download" class="p-button-info"
+                (click)="importItems()"></button>&nbsp;
+            <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"
+                (click)="exportItems()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- item list -->
+    <p-table #dt [value]="items" [rows]="10" [paginator]="true" [globalFilterFields]="['title', 'summary']"
+        [(selection)]="selectedItems" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                <h5 class="p-m-0">Manage {{ itemName}}</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="title">Title <p-sortIcon field="title"></p-sortIcon></th>
+                <th pSortableColumn="summary">Summary <p-sortIcon field="summary"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                </td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.summary }}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+                        (click)="editItem(item)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                        (click)="deleteItem(item)"></button>
+                    <button pButton pRipple icon="pi pi-bars" class="p-button-rounded p-button-secondary"
+                        (click)="openDagDialog(item)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+                In total there are {{ items ? items.length : 0 }} items.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- entry-edit form -->
+<p-dialog [(visible)]="itemDialog" [style]="{ width: '450px' }" header="Details" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="p-field">
+            <label for="title">Title</label>
+            <input type="text" pInputText id="title" [(ngModel)]="item.title" required autofocus />
+            <small class="p-invalid" *ngIf="submitted && !item.title">Title is required.</small>
+        </div>
+        <div class="p-field">
+            <label for="summary">Summary</label>
+            <input type="text" pInputText id="summary" [(ngModel)]="item.summary" required />
+            <small class="p-invalid" *ngIf="submitted && !item.summary">Summary is required.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveItem()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- DAG Image Modal -->
+<p-dialog 
+    header="{{dagView}}" 
+    [(visible)]="showDagDialog" 
+    [modal]="true" 
+    [style]="{ width: '80vw', height: '80vh' }"
+    [draggable]="false"
+    [resizable]="false"
+    [contentStyle]="{ padding: '0' }"
+>
+    <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+        <img 
+            [src]="dagImageUrl" 
+            alt="DAG Diagram" 
+            style="max-width: 100%; max-height: 100%; object-fit: contain;"
+        />
+    </div>
+</p-dialog>
+
+
+<!-- delete confirmation -->
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

@@ -1,0 +1,17 @@
+<div class="d-none">
+    <h6>Child Component</h6>
+    <div style="border: 1px red solid">
+        <pn-calendar
+            #calendarComp
+            [rangeDates]="rangeDates"
+            [dropdownItems]="dropdownItems"
+            [onExternalMethod]="handleExternalMethod"
+            (save)="handleSave()"
+            (load)="handleLoad()"
+        >
+        </pn-calendar>
+    </div>
+    <hr />
+    <h6>Parent Component</h6>
+    <button (click)="setDates()">Set Date Range</button>
+</div>

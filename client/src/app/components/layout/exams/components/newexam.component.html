@@ -1,0 +1,74 @@
+<style>
+    /* Full width for dropdown */
+    ::ng-deep .w-full {
+        width: 100% !important;
+    }
+</style>
+
+<p-toast></p-toast>
+
+<div class="p-fluid">
+    <p-card>
+        <ng-template pTemplate="header">
+            <div class="text-xl font-semibold">Taking Exams</div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+            <div class="p-field">
+                <label for="profileDropdown">Select Student Profile</label>
+                <p-dropdown id="profileDropdown" [options]="profileList" [(ngModel)]="selectedProfile"
+                    optionLabel="title" optionValue="user_id" [filter]="true" placeholder="Select Profile"
+                    (onChange)="showExamInfo($event)" appendTo="body" class="w-full">
+                </p-dropdown>
+            </div>
+
+            <div *ngIf="examInfoResolved" class="p-mt-3">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <div class="text-lg font-semibold">Exam Information</div>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                        <p>{{ exam_info }}</p>
+                        <button pButton type="button" [label]="exam_action_text"
+                            class="p-button-rounded p-button-outlined p-button-primary" (click)="startExam()"></button>
+                    </ng-template>
+                </p-card>
+            </div>
+        </ng-template>
+    </p-card>
+</div>
+<!-- exam dialog -->
+<p-dialog [(visible)]="examDialog" [style]="{ width: '800px', minHeight: '500px' }" header="Adaptive Exam"
+    [modal]="true" styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+        <div class="p-field p-shadow-3 p-p-4 p-mb-4" style="border-radius: 8px; background-color: #f9f9f9;">
+            <h3 class="text-lg font-bold mb-4">{{ currentQuestion?.title }}</h3>
+
+            <div *ngFor="let option of currentQuestion?.options" class="p-p-2 mb-2"
+                style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: 0.2s;"
+                [ngClass]="{'p-shadow-2': selectedAnswer === option}" (click)="selectedAnswer = option">
+
+                <p-radioButton name="examOptions" [value]="option" [(ngModel)]="selectedAnswer"
+                    inputId="{{ 'option_' + option.id }}" style="margin-right: 10px;">
+                </p-radioButton>
+
+                <label [for]="'option_' + option.id" class="mb-0" style="cursor: pointer;">
+                    {{ option?.text }}
+                </label>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            <button pButton pRipple label="Finish Exam" icon="pi pi-times" class="p-button-text"
+                (click)="finishExam()"></button>
+            <button pButton pRipple label="Submit" icon="pi pi-check" class="p-button-text"
+                (click)="submitAnswer()"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- finish exam confirmation -->
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
